@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { CassetteBlock } from "@/components/CassetteBlock";
+import { ComparisonBlock } from "@/components/ComparisonBlock";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -44,22 +45,24 @@ export default function Home() {
     <main
       id="scroll-container"
       ref={containerRef}
-      className="container-snap"
+      className="container-snap w-full lg:px-16 lg:pr-[200px] z-0 relative"
     >
       {/* Block 0 — Intro */}
       <section
         id="intro"
         data-section="intro"
-        className="section flex items-center justify-center px-4 sm:px-6 py-16 sm:py-20 md:py-24"
+        className="section flex flex-col items-center justify-center py-16 sm:py-20 md:py-24"
       >
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading text-[#e8e6e3] uppercase tracking-wider mb-6 sm:mb-8">
             Cassette Recording Experiment
           </h1>
-          <p className="text-[#c8c8c8] font-serif text-sm sm:text-base md:text-lg leading-relaxed mb-6">
-            This project explores how the album The Tortured Poets Department sounds
-            when recorded onto different cassette tape types. Each section presents a different
-            tape formulation and its sonic characteristics.
+          <p className="text-[#c8c8c8] font-serif text-base sm:text-lg leading-[1.7] mb-10 text-center">
+            This project explores how &ldquo;The Tortured Poets Department&rdquo; sounds when
+            recorded onto different cassette tape formulations.
+          </p>
+          <p className="text-[#c8c8c8]/90 font-serif text-base sm:text-lg leading-[1.7] mb-12 text-center">
+            Each section represents a different tape type used in the experiment.
           </p>
         </div>
       </section>
@@ -160,6 +163,9 @@ export default function Home() {
         cassetteVariant="original"
         cassetteLabel="Original"
       />
+
+      {/* Compare: switch formulations without losing playback position */}
+      <ComparisonBlock />
     </main>
   );
 }

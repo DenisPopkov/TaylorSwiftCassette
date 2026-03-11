@@ -124,24 +124,59 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
           Select track
         </p>
         <ul className="space-y-1 mb-6 max-h-48 overflow-y-auto pr-1">
-          {TTPD_TRACKS.map((t, i) => (
+          <li className="text-[#9f9f9f] font-heading text-[10px] uppercase tracking-widest pt-0 pb-0.5">
+            SIDE A
+          </li>
+          {TTPD_TRACKS.slice(0, 3).map((t, i) => (
             <li key={t.id}>
               <button
                 type="button"
                 onClick={() => loadTrack(i)}
-                className={`w-full text-left py-2 px-3 text-sm font-heading transition-colors ${
+                className={`w-full text-left py-2 px-3 text-sm font-heading transition-colors flex items-center gap-2 ${
                   currentIndex === i
                     ? "bg-[#e8e6e3]/15 text-[#e8e6e3] border-l-2 border-[#e8e6e3]"
                     : "text-[#9f9f9f] hover:text-[#e8e6e3] hover:bg-[#e8e6e3]/5"
                 }`}
               >
+                {currentIndex === i && (
+                  <span className="text-[#e8e6e3] shrink-0" aria-hidden>
+                    {playing ? "▌▌" : "▶"}
+                  </span>
+                )}
                 {t.title}
               </button>
             </li>
           ))}
+          <li className="text-[#9f9f9f] font-heading text-[10px] uppercase tracking-widest pt-3 pb-0.5">
+            SIDE B
+          </li>
+          {TTPD_TRACKS.slice(3, 5).map((t, i) => {
+            const idx = i + 3;
+            return (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  onClick={() => loadTrack(idx)}
+                  className={`w-full text-left py-2 px-3 text-sm font-heading transition-colors flex items-center gap-2 ${
+                    currentIndex === idx
+                      ? "bg-[#e8e6e3]/15 text-[#e8e6e3] border-l-2 border-[#e8e6e3]"
+                      : "text-[#9f9f9f] hover:text-[#e8e6e3] hover:bg-[#e8e6e3]/5"
+                  }`}
+                >
+                  {currentIndex === idx && (
+                    <span className="text-[#e8e6e3] shrink-0" aria-hidden>
+                      {playing ? "▌▌" : "▶"}
+                    </span>
+                  )}
+                  {t.title}
+                </button>
+              </li>
+            );
+          })}
         </ul>
 
-        <p className="text-[#e8e6e3] font-heading text-sm mb-4 truncate" title={track?.title}>
+        <p className="text-[#e8e6e3] font-heading text-sm mb-4 truncate flex items-center gap-2" title={track?.title}>
+          {playing && <span className="shrink-0" aria-hidden>►</span>}
           {track?.title}
         </p>
 

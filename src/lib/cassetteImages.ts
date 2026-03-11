@@ -1,9 +1,9 @@
-// Локальные изображения из public/tapes (из папки tapes на рабочем столе)
+// Изображения кассет из public/tapes — под каждый тип своя фотка
 
 export const CASSETTE_IMAGES: Record<string, string> = {
-  "type-i": "/tapes/all.png",
-  "type-ii": "/tapes/all.png",
-  "type-iii": "/tapes/all.png",
-  "type-iv": "/tapes/all.png",
+  "type-i": "/tapes/type-i.png",
+  "type-ii": "/tapes/type-ii.png",
+  "type-iii": "/tapes/type-iii.png",
+  "type-iv": "/tapes/type-iv.png",
   original: "/tapes/original.png",
 };

@@ -2,8 +2,8 @@
 
 export function Header() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0b0b0b] py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <header className="fixed top-0 left-0 right-0 z-[150] bg-[#0b0b0b] py-4 sm:py-6 px-4 sm:px-6 lg:px-16">
+      <div className="max-w-4xl mx-auto w-full">
         <div className="text-[#e8e6e3] font-heading text-center tracking-wide">
           <div className="text-xs sm:text-sm md:text-base uppercase tracking-[0.2em] sm:tracking-[0.3em] opacity-90">
             Taylor Swift

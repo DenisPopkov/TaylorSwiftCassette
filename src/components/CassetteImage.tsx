@@ -18,29 +18,25 @@ export function CassetteImage({
 }: CassetteImageProps) {
   const { open } = useAudioPlayerOpen();
 
-  const imageStyle = {
-    width: "100%",
-    minWidth: 0,
-    aspectRatio: "4/3" as const,
-  };
-
   return (
-    <div className={`flex flex-col items-center gap-4 w-full max-w-[308px] sm:max-w-[360px] ${className}`}>
+    <div className={`flex flex-col items-center gap-4 w-[308px] sm:w-[360px] min-w-[308px] sm:min-w-[360px] shrink-0 ${className}`}>
       <button
         type="button"
         onClick={() => open(cassetteLabel)}
-        className="min-h-[44px] min-w-[44px] px-5 py-2.5 border border-[#e8e6e3]/50 text-[#e8e6e3] text-sm uppercase tracking-widest hover:bg-[#e8e6e3]/10 active:bg-[#e8e6e3]/15 transition-colors font-heading shrink-0 rounded-none"
+        className="play-button min-h-[44px] min-w-[44px] px-5 py-2.5 border border-[#e8e6e3]/50 text-[#e8e6e3] text-sm uppercase tracking-widest hover:bg-[#e8e6e3]/10 hover:border-[#e8e6e3] hover:scale-105 active:bg-[#e8e6e3]/15 transition-all duration-200 font-heading shrink-0 rounded-none flex items-center gap-2"
         aria-label="Play cassette"
       >
-        Play
+        <span className="text-base leading-none" aria-hidden>▶</span>
+        <span>Play cassette</span>
       </button>
-      <div className="relative bg-[#0b0b0b] shrink-0 w-full" style={imageStyle}>
+      {/* 4:3 как у типичного фото кассеты (800×600), object-contain сохраняет пропорции */}
+      <div className="relative w-full shrink-0" style={{ aspectRatio: "4/3" }}>
         <Image
           src={src}
           alt={alt}
           fill
-          className="object-contain drop-shadow-2xl"
-          sizes="(max-width: 640px) 277px, (max-width: 768px) 306px, 340px"
+          className="object-contain"
+          sizes="(max-width: 640px) 308px, 360px"
         />
       </div>
     </div>
