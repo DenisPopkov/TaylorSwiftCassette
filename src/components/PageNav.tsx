@@ -127,26 +127,31 @@ export function PageNav() {
   };
 
   return (
-    <div
-      className="fixed inset-y-0 right-0 w-[180px] z-[9999] pointer-events-none"
-      aria-hidden
-    >
+    <>
+      {/* Полоса справа только на desktop (lg), на мобильных не занимаем место */}
+      <div
+        className="hidden lg:block fixed inset-y-0 right-0 w-[180px] z-[9999] pointer-events-none"
+        aria-hidden
+      >
+      {/* Боковое меню — только на desktop; на мобильных не показываем, чтобы не перекрывать контент */}
       <nav
-        className="fixed top-1/2 right-0 min-w-[140px] pl-4 pr-6 py-2 -translate-y-1/2 pointer-events-auto"
+        className="hidden lg:block fixed top-1/2 right-0 min-w-[140px] pl-4 pr-6 py-2 -translate-y-1/2 pointer-events-auto"
         aria-label="Section navigation"
       >
         <ul className="space-y-0 text-right">
           {navItems.map(({ id, label }) => navButton(id, label))}
         </ul>
       </nav>
-      <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10 pointer-events-auto"
-        aria-label="Section navigation"
-      >
-        <ul className="flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto px-3 py-3 scrollbar-hide">
-          {navItems.map(({ id, label }) => navButton(id, label))}
-        </ul>
-      </nav>
     </div>
+    {/* Нижний навбар на мобильных — на всю ширину, с safe-area для iPhone */}
+    <nav
+      className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10 pointer-events-auto z-[9999] pb-[env(safe-area-inset-bottom)]"
+      aria-label="Section navigation (mobile)"
+    >
+      <ul className="flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto px-3 py-3 scrollbar-hide">
+        {navItems.map(({ id, label }) => navButton(id, label))}
+      </ul>
+    </nav>
+    </>
   );
 }
