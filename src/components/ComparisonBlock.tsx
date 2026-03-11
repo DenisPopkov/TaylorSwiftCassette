@@ -123,6 +123,14 @@ export function ComparisonBlock() {
     setPlaying(!playing);
   }, [playing]);
 
+  const togglePlayRef = useRef(togglePlay);
+  togglePlayRef.current = togglePlay;
+  useEffect(() => {
+    const onPlayPause = () => togglePlayRef.current?.();
+    window.addEventListener("play-pause-compare", onPlayPause);
+    return () => window.removeEventListener("play-pause-compare", onPlayPause);
+  }, []);
+
   const goPrev = useCallback(() => {
     if (!hasPrev) return;
     seekTimeRef.current = 0;
@@ -164,9 +172,9 @@ export function ComparisonBlock() {
     <section
       id="compare"
       data-section="compare"
-      className="section flex flex-col items-center justify-center min-h-screen py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 lg:px-24"
+      className="section flex flex-col items-center justify-center min-h-screen py-16 sm:py-20 md:py-24 lg:py-28 pb-24 px-4 sm:px-6 lg:px-24"
     >
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto relative z-10">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading text-[#e8e6e3] uppercase tracking-wider text-center mb-4">
           Cassette Comparison
         </h2>
@@ -221,7 +229,12 @@ export function ComparisonBlock() {
                     src={CASSETTE_IMAGES[id] ?? CASSETTE_IMAGES["type-i"]}
                     alt=""
                     className="pointer-events-none object-contain"
-                    style={{ maxWidth: "100%", maxHeight: "100%", width: "auto", height: "auto" }}
+                    style={{
+                      maxWidth: id === "original" ? "75%" : "100%",
+                      maxHeight: id === "original" ? "75%" : "100%",
+                      width: "auto",
+                      height: "auto",
+                    }}
                   />
                 </span>
                 <span className="text-[10px] sm:text-xs font-heading uppercase tracking-wider text-[#9f9f9f]">
@@ -296,12 +309,12 @@ export function ComparisonBlock() {
           <span>{formatTime(duration)}</span>
         </div>
 
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 relative z-20">
           <button
             type="button"
             onClick={goPrev}
             disabled={!hasPrev}
-            className="p-2 border border-[#e8e6e3]/40 text-[#e8e6e3] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#e8e6e3]/10 transition-colors"
+            className="p-2 border border-[#e8e6e3]/40 text-[#e8e6e3] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#e8e6e3]/10 transition-colors cursor-pointer"
             aria-label="Previous track"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -310,8 +323,9 @@ export function ComparisonBlock() {
           </button>
           <button
             type="button"
+            data-play-pause-compare
             onClick={togglePlay}
-            className="p-3 border border-[#e8e6e3]/40 text-[#e8e6e3] hover:bg-[#e8e6e3]/10 transition-colors"
+            className="p-3 border border-[#e8e6e3]/40 text-[#e8e6e3] hover:bg-[#e8e6e3]/10 transition-colors cursor-pointer min-w-[52px] min-h-[52px] flex items-center justify-center"
             aria-label={playing ? "Pause" : "Play"}
           >
             {playing ? (
@@ -328,7 +342,7 @@ export function ComparisonBlock() {
             type="button"
             onClick={goNext}
             disabled={!hasNext}
-            className="p-2 border border-[#e8e6e3]/40 text-[#e8e6e3] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#e8e6e3]/10 transition-colors"
+            className="p-2 border border-[#e8e6e3]/40 text-[#e8e6e3] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#e8e6e3]/10 transition-colors cursor-pointer"
             aria-label="Next track"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

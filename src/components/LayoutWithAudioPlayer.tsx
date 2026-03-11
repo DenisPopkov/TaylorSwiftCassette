@@ -23,9 +23,17 @@ export function LayoutWithAudioPlayer({ children }: { children: React.ReactNode 
       if (analysisEl) {
         e.preventDefault();
         e.stopPropagation();
-        // Только по click, иначе mousedown+click дают двойной тоггл и кнопка возвращается в «SHOW»
         if (e.type === "click") {
           window.dispatchEvent(new CustomEvent("toggle-audio-analysis"));
+        }
+        return;
+      }
+      const playPauseCompare = target.closest("[data-play-pause-compare]");
+      if (playPauseCompare) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "click") {
+          window.dispatchEvent(new CustomEvent("play-pause-compare"));
         }
       }
     };

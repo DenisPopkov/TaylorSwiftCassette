@@ -24,7 +24,7 @@ export function CassetteImage({
 
   return (
     <div
-      className={`flex flex-col items-center gap-4 shrink-0 w-[308px] sm:w-[360px] min-w-0 ${className}`}
+      className={`flex flex-col items-center gap-3 sm:gap-4 shrink-0 w-full max-w-[240px] sm:max-w-[308px] md:max-w-[360px] min-w-0 sm:w-[308px] md:w-[360px] ${className}`}
     >
       <button
         type="button"
@@ -33,20 +33,16 @@ export function CassetteImage({
         className="play-button min-h-[44px] min-w-[44px] px-5 py-2.5 border border-[#e8e6e3]/50 text-[#e8e6e3] text-sm uppercase tracking-widest hover:bg-[#e8e6e3]/10 hover:border-[#e8e6e3] hover:scale-105 active:bg-[#e8e6e3]/15 transition-all duration-200 font-heading shrink-0 rounded-none flex items-center gap-2"
         aria-label="Play cassette"
       >
-        <span className="text-base leading-none" aria-hidden>▶</span>
+        <svg className="w-4 h-4 shrink-0 text-[#e8e6e3]" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M8 5v14l11-7z" />
+        </svg>
         <span>Play cassette</span>
       </button>
-      {/* Единый квадратный контейнер. Type I–IV увеличены на 50%, Original — базовый размер. */}
+      {/* Original принудительно уменьшаем (75%), чтобы визуально совпадал с Type I–IV */}
       <div
-        className="relative w-[308px] h-[308px] sm:w-[360px] sm:h-[360px] shrink-0 overflow-hidden"
-        style={
-          variant === "type-i" ||
-          variant === "type-ii" ||
-          variant === "type-iii" ||
-          variant === "type-iv"
-            ? { transform: "scale(1.5)" }
-            : undefined
-        }
+        className={`relative w-[200px] h-[200px] sm:w-[308px] sm:h-[308px] md:w-[360px] md:h-[360px] shrink-0 overflow-hidden mx-auto ${
+          variant === "original" ? "scale-[0.75] origin-center" : ""
+        }`}
       >
         <Image
           src={src}

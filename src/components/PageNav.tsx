@@ -143,12 +143,12 @@ export function PageNav() {
         </ul>
       </nav>
     </div>
-    {/* Нижний навбар на мобильных — на всю ширину, с safe-area для iPhone */}
+    {/* Нижний навбар на мобильных — без переноса подписей (TYPE I в одну строку), горизонтальный скролл при нехватке места */}
     <nav
       className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10 pointer-events-auto z-[9999] pb-[env(safe-area-inset-bottom)]"
       aria-label="Section navigation (mobile)"
     >
-      <ul className="flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto px-3 py-3 scrollbar-hide">
+      <ul className="flex items-center justify-center flex-nowrap gap-2 overflow-x-auto overflow-y-hidden px-2 py-2.5 scrollbar-hide [&_button]:whitespace-nowrap [&_button]:flex-shrink-0 [&_button]:text-[10px] [&_button]:min-w-0 [&_button]:px-2 sm:[&_button]:text-xs sm:[&_button]:px-2.5">
         {navItems.map(({ id, label }) => navButton(id, label))}
       </ul>
     </nav>
