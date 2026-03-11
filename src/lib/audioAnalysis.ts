@@ -24,8 +24,7 @@ export async function analyzeAudioFromUrl(url: string): Promise<AnalysisResult> 
       const res = await fetch(url);
       const arrayBuffer = await res.arrayBuffer();
       const ctx = new (window.AudioContext ||
-        // @ts-expect-error webkitAudioContext for Safari
-        (window as any).webkitAudioContext)();
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       const buffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
       const channel = buffer.getChannelData(0);
       const sampleRate = buffer.sampleRate;

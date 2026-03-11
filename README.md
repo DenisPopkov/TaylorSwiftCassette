@@ -19,6 +19,19 @@ npm run dev
 
 Откройте [http://localhost:3000](http://localhost:3000).
 
+## GitHub Pages
+
+Сайт можно развернуть на GitHub Pages (статический экспорт).
+
+1. **Один раз в настройках репозитория:**  
+   **Settings → Pages → Build and deployment → Source:** выберите **GitHub Actions**.
+
+2. Пушите в ветку `main` (или `master`) — workflow соберёт проект и задеплоит.  
+   Сайт будет доступен по адресу:  
+   `https://<ваш-username>.github.io/<имя-репозитория>/`
+
+Сборка использует `output: 'export'` и `NEXT_PUBLIC_PAGES_BASE_PATH` для корректных путей на GitHub Pages.
+
 ## Структура
 
 - **7 экранов:** Intro → Type I → Type II → Type III → Type IV → Original → Footer
