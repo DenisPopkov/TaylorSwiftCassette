@@ -31,12 +31,14 @@ type Props = {
   formulation: FormulationId;
   trackTitle: string;
   isOpen: boolean;
+  onFormulationChange?: (id: FormulationId) => void;
 };
 
 export function AudioAnalysisPanel({
   trackIndex,
   formulation,
   isOpen,
+  onFormulationChange,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [analysisType, setAnalysisType] = useState<AnalysisTypeId>("waveform");
@@ -52,13 +54,13 @@ export function AudioAnalysisPanel({
     setError(null);
     setDataByFormulation({} as Record<FormulationId, AnalysisResult | null>);
     try {
-      const entries = await Promise.all(
-        COMPARISON_FORMULATIONS.map(async (f) => {
-          const url = getComparisonSrc(trackIndex, f.id);
-          const result = await analyzeAudioFromUrl(url);
-          return [f.id, result] as const;
-        })
-      );
+      const entries: [FormulationId, AnalysisResult][] = [];
+      // Считаем формулы последовательно, чтобы не блокировать UI пиком нагрузки
+      for (const f of COMPARISON_FORMULATIONS) {
+        const url = getComparisonSrc(trackIndex, f.id);
+        const result = await analyzeAudioFromUrl(url);
+        entries.push([f.id, result]);
+      }
       const next: Record<FormulationId, AnalysisResult | null> = {} as Record<
         FormulationId,
         AnalysisResult | null
@@ -266,17 +268,25 @@ export function AudioAnalysisPanel({
       {!loading && !error && hasData && (
         <>
           <div className="flex flex-wrap gap-x-4 gap-y-1 mb-2 transition-colors duration-200">
-            {COMPARISON_FORMULATIONS.map((f) => (
-              <span
-                key={f.id}
-                className={`font-heading text-[10px] uppercase tracking-wider transition-colors duration-200 ${
-                  f.id === formulation ? "text-[#e8e6e3]" : "text-[#9f9f9f]"
-                }`}
-              >
-                {f.label}
-                {f.id === formulation ? " (active)" : ""}
-              </span>
-            ))}
+            {COMPARISON_FORMULATIONS.map((f) => {
+              const isActive = f.id === formulation;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => onFormulationChange?.(f.id)}
+                  disabled={!onFormulationChange}
+                  className={`font-heading text-[10px] uppercase tracking-wider transition-colors duration-200 min-h-[32px] px-1 -mx-1 rounded border border-transparent ${
+                    isActive
+                      ? "text-[#e8e6e3]"
+                      : "text-[#9f9f9f] hover:text-[#e8e6e3] hover:border-[#e8e6e3]/30"
+                  } ${!onFormulationChange ? "cursor-default" : "cursor-pointer"}`}
+                >
+                  {f.label}
+                  {isActive ? " (active)" : ""}
+                </button>
+              );
+            })}
           </div>
           <div
             key={graphKey}

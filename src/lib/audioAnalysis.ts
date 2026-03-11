@@ -1,9 +1,11 @@
 import { magnitudeSpectrum } from "./fft";
 
-const FFT_SIZE = 2048;
+// Параметры слегка уменьшены ради производительности.
+// Визуально качество остаётся приемлемым, а расчёты становятся заметно легче.
+const FFT_SIZE = 1024;
 const SPECTRUM_HOP = 1024;
-const SPECTROGRAM_HOP = 512;
-const WAVEFORM_POINTS = 1500;
+const SPECTROGRAM_HOP = 1024;
+const WAVEFORM_POINTS = 900;
 
 export type AnalysisResult = {
   waveform: Float32Array;
@@ -13,26 +15,41 @@ export type AnalysisResult = {
   sampleRate: number;
 };
 
+// Кэш по URL, чтобы не пересчитывать анализ при повторном открытии панели
+const analysisCache = new Map<string, Promise<AnalysisResult>>();
+
 export async function analyzeAudioFromUrl(url: string): Promise<AnalysisResult> {
-  const res = await fetch(url);
-  const arrayBuffer = await res.arrayBuffer();
-  const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-  const buffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
-  const channel = buffer.getChannelData(0);
-  const sampleRate = buffer.sampleRate;
-  const duration = buffer.duration;
+  if (!analysisCache.has(url)) {
+    const promise = (async () => {
+      const res = await fetch(url);
+      const arrayBuffer = await res.arrayBuffer();
+      const ctx = new (window.AudioContext ||
+        // @ts-expect-error webkitAudioContext for Safari
+        (window as any).webkitAudioContext)();
+      const buffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+      const channel = buffer.getChannelData(0);
+      const sampleRate = buffer.sampleRate;
+      const duration = buffer.duration;
 
-  const waveform = downsample(channel, WAVEFORM_POINTS);
+      const waveform = downsample(channel, WAVEFORM_POINTS);
+      const spectrum = averageSpectrum(channel, FFT_SIZE, SPECTRUM_HOP);
 
-  const spectrum = averageSpectrum(channel, FFT_SIZE, SPECTRUM_HOP);
+      const spectrogram: Float32Array[] = [];
+      for (
+        let start = 0;
+        start + FFT_SIZE <= channel.length;
+        start += SPECTROGRAM_HOP
+      ) {
+        const slice = channel.subarray(start, start + FFT_SIZE);
+        spectrogram.push(magnitudeSpectrum(slice, FFT_SIZE));
+      }
 
-  const spectrogram: Float32Array[] = [];
-  for (let start = 0; start + FFT_SIZE <= channel.length; start += SPECTROGRAM_HOP) {
-    const slice = channel.subarray(start, start + FFT_SIZE);
-    spectrogram.push(magnitudeSpectrum(slice, FFT_SIZE));
+      return { waveform, spectrum, spectrogram, duration, sampleRate };
+    })();
+    analysisCache.set(url, promise);
   }
 
-  return { waveform, spectrum, spectrogram, duration, sampleRate };
+  return analysisCache.get(url)!;
 }
 
 function downsample(samples: Float32Array, targetLen: number): Float32Array {

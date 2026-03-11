@@ -57,6 +57,7 @@ export function CassetteBlock({
               src={imageSrc}
               alt={cassetteLabel}
               cassetteLabel={cassetteLabel}
+              variant={cassetteVariant}
             />
           </div>
 

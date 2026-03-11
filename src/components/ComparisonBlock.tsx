@@ -37,6 +37,13 @@ export function ComparisonBlock() {
     setGlobalPlaying(playing);
     return () => setGlobalPlaying(false);
   }, [playing, setGlobalPlaying]);
+
+  // Клик по «Show audio analysis» может прийти через document (capture) — подписываемся на кастомное событие
+  useEffect(() => {
+    const onToggle = () => setShowAnalysis((v) => !v);
+    window.addEventListener("toggle-audio-analysis", onToggle);
+    return () => window.removeEventListener("toggle-audio-analysis", onToggle);
+  }, []);
   const hasPrev = trackIndex > 0;
   const hasNext = trackIndex < TTPD_TRACKS.length - 1;
 
@@ -170,56 +177,66 @@ export function ComparisonBlock() {
           Switch between tape types to hear the difference instantly.
         </p>
 
-        {/* Source: formulation buttons */}
-        <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-3">
-          Source
-        </p>
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">
-          {COMPARISON_FORMULATIONS.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => switchFormulation(id)}
-              className={`min-h-[44px] px-4 py-2 border font-heading text-xs uppercase tracking-widest transition-all ${
-                formulation === id
-                  ? "border-[#e8e6e3] bg-[#e8e6e3]/15 text-[#e8e6e3] scale-105"
-                  : "border-[#e8e6e3]/40 text-[#9f9f9f] hover:border-[#e8e6e3]/60 hover:text-[#e8e6e3]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Optional: 5 cassette thumbnails */}
-        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8">
-          {COMPARISON_FORMULATIONS.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => switchFormulation(id)}
-              className={`flex flex-col items-center gap-1 transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8e6e3] ${
-                formulation === id ? "scale-110" : "opacity-70 hover:opacity-100"
-              }`}
-              aria-label={`Play ${label}`}
-            >
-              <img
-                src={CASSETTE_IMAGES[id] ?? CASSETTE_IMAGES["type-i"]}
-                alt=""
-                className="w-14 h-14 sm:w-16 sm:h-16 object-contain pointer-events-none"
-              />
-              <span className="text-[10px] sm:text-xs font-heading uppercase tracking-wider text-[#9f9f9f]">
+        {/* Source: блок с фоном для ясности */}
+        <div className="rounded-md border border-[#e8e6e3]/15 bg-[#0b0b0b]/60 px-4 py-5 mb-8">
+          <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-3">
+            Source
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
+            {COMPARISON_FORMULATIONS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => switchFormulation(id)}
+                className={`min-h-[44px] px-4 py-2 border font-heading text-xs uppercase tracking-widest transition-all ${
+                  formulation === id
+                    ? "border-[#e8e6e3] bg-[#e8e6e3]/15 text-[#e8e6e3] scale-105"
+                    : "border-[#e8e6e3]/40 text-[#9f9f9f] hover:border-[#e8e6e3]/60 hover:text-[#e8e6e3]"
+                }`}
+              >
                 {label}
-              </span>
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
+
+          {/* 5 кассет — фиксированный контейнер на каждую, фон ячейки */}
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            {COMPARISON_FORMULATIONS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => switchFormulation(id)}
+                className={`flex flex-col items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8e6e3] rounded p-2 transition-opacity ${
+                  formulation === id
+                    ? "opacity-100 bg-[#e8e6e3]/5"
+                    : "opacity-80 hover:opacity-100 bg-[#e8e6e3]/[0.03]"
+                }`}
+                aria-label={`Source ${label}`}
+              >
+                <span
+                  className="w-[70px] h-[40px] sm:w-[80px] sm:h-[50px] flex items-center justify-center overflow-hidden shrink-0 rounded border border-[#e8e6e3]/10 bg-[#0b0b0b]/80"
+                  style={{ minWidth: 70, minHeight: 40 }}
+                >
+                  <img
+                    src={CASSETTE_IMAGES[id] ?? CASSETTE_IMAGES["type-i"]}
+                    alt=""
+                    className="pointer-events-none object-contain"
+                    style={{ maxWidth: "100%", maxHeight: "100%", width: "auto", height: "auto" }}
+                  />
+                </span>
+                <span className="text-[10px] sm:text-xs font-heading uppercase tracking-wider text-[#9f9f9f]">
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Track */}
         <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2">
           Track
         </p>
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap justify-center gap-2 mb-6 text-center">
           {TTPD_TRACKS.map((t, i) => (
             <button
               key={t.id}
@@ -323,8 +340,9 @@ export function ComparisonBlock() {
         <div className="mt-8 pt-6 border-t border-[#e8e6e3]/15">
           <button
             type="button"
+            data-show-analysis-toggle
             onClick={() => setShowAnalysis((v) => !v)}
-            className="w-full min-h-[48px] border border-[#e8e6e3]/40 font-heading text-xs uppercase tracking-widest text-[#9f9f9f] hover:text-[#e8e6e3] hover:border-[#e8e6e3]/60 transition-colors"
+            className="w-full min-h-[48px] border border-[#e8e6e3]/40 font-heading text-xs uppercase tracking-widest text-[#9f9f9f] hover:text-[#e8e6e3] hover:border-[#e8e6e3]/60 transition-colors cursor-pointer relative z-10"
           >
             {showAnalysis ? "Hide audio analysis" : "Show audio analysis"}
           </button>
@@ -336,6 +354,7 @@ export function ComparisonBlock() {
             formulation={formulation}
             trackTitle={track?.title ?? ""}
             isOpen={showAnalysis}
+            onFormulationChange={setFormulation}
           />
         )}
       </div>

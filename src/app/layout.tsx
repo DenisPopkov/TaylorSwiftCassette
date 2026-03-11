@@ -44,8 +44,8 @@ export default function RootLayout({
         <AudioPlayingProvider>
           <AudioPlayerOpenProvider>
             <Header />
-            <PageNav />
             <LayoutWithAudioPlayer>{children}</LayoutWithAudioPlayer>
+            <PageNav />
           </AudioPlayerOpenProvider>
         </AudioPlayingProvider>
       </body>

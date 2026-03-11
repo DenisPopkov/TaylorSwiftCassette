@@ -27,27 +27,27 @@ export function PageNav() {
   const [activeId, setActiveId] = useState("intro");
   const lastActiveRef = useRef("intro");
 
-  // Клики: нативный listener на body в capture-фазе
+  // Клики по нав-кнопкам (nav теперь после main в DOM — клики доходят)
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const btn = (e.target as HTMLElement).closest("[data-goto]");
-      if (!btn) return;
+    const handle = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement).closest("[data-goto]");
+      if (!el) return;
       e.preventDefault();
       e.stopPropagation();
-      const id = (btn as HTMLElement).getAttribute("data-goto");
+      const id = (el as HTMLElement).getAttribute("data-goto");
       if (id) scrollToSection(id);
     };
-    document.body.addEventListener("click", handleClick, true);
-    return () => document.body.removeEventListener("click", handleClick, true);
+    document.addEventListener("click", handle, true);
+    return () => document.removeEventListener("click", handle, true);
   }, []);
 
-  // Скролл: подписка на #scroll-container с повторными попытками
+  // Скролл: подписка на #scroll-container с повторными попытками и по load/DOMContentLoaded
   useEffect(() => {
     let cleanup: (() => void) | undefined;
     let raf = 0;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
 
-    function attach(container: HTMLElement) {
+    function run(container: HTMLElement) {
       const handleScroll = () => {
         raf = requestAnimationFrame(() => {
           const sections = container.querySelectorAll<HTMLElement>("[data-section]");
@@ -76,20 +76,30 @@ export function PageNav() {
 
     function tryAttach() {
       const container = document.getElementById("scroll-container");
-      if (container) {
-        cleanup = attach(container);
+      if (container && !cleanup) {
+        cleanup = run(container);
         timeouts.forEach(clearTimeout);
         timeouts.length = 0;
       }
     }
 
-    timeouts.push(setTimeout(tryAttach, 0));
+    tryAttach();
     timeouts.push(setTimeout(tryAttach, 50));
-    timeouts.push(setTimeout(tryAttach, 150));
-    timeouts.push(setTimeout(tryAttach, 400));
+    timeouts.push(setTimeout(tryAttach, 200));
+    timeouts.push(setTimeout(tryAttach, 500));
+    if (typeof window !== "undefined") {
+      if (document.readyState === "complete") tryAttach();
+      else window.addEventListener("load", tryAttach);
+      document.readyState !== "loading" && tryAttach();
+      document.addEventListener("DOMContentLoaded", tryAttach);
+    }
 
     return () => {
       timeouts.forEach(clearTimeout);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("load", tryAttach);
+        document.removeEventListener("DOMContentLoaded", tryAttach);
+      }
       cleanup?.();
     };
   }, []);
@@ -118,11 +128,11 @@ export function PageNav() {
 
   return (
     <div
-      className="fixed inset-y-0 right-0 w-[180px] z-[99999] pointer-events-none"
+      className="fixed inset-y-0 right-0 w-[180px] z-[9999] pointer-events-none"
       aria-hidden
     >
       <nav
-        className="fixed top-1/2 right-0 pointer-events-auto min-w-[140px] pl-4 pr-6 py-2 -translate-y-1/2"
+        className="fixed top-1/2 right-0 min-w-[140px] pl-4 pr-6 py-2 -translate-y-1/2 pointer-events-auto"
         aria-label="Section navigation"
       >
         <ul className="space-y-0 text-right">
@@ -130,7 +140,7 @@ export function PageNav() {
         </ul>
       </nav>
       <nav
-        className="fixed bottom-0 left-0 right-0 pointer-events-auto lg:hidden bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10"
+        className="fixed bottom-0 left-0 right-0 lg:hidden bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10 pointer-events-auto"
         aria-label="Section navigation"
       >
         <ul className="flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto px-3 py-3 scrollbar-hide">
