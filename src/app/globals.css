@@ -30,8 +30,8 @@ body {
   height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
-  /* Нижний отступ: Compare высокий + нижний навбар; на lg сбрасывается ниже */
-  padding-bottom: calc(12rem + env(safe-area-inset-bottom, 0));
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(14rem + env(safe-area-inset-bottom, 0));
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
   /* hide scrollbar so layout doesn’t “shift” */
@@ -77,10 +77,12 @@ body::before {
   scroll-margin-top: 1rem;
 }
 
-/* Compare: точка привязки в начале — удобно доскроллить с Original; scroll-snap-stop: normal — внутри секции можно свободно листать */
+/* Compare: высота по контенту (не 100vh), чтобы весь блок доскролливался; scroll-snap-stop: normal — внутри листается свободно */
 #compare.section {
+  min-height: auto;
   scroll-snap-align: start;
   scroll-snap-stop: normal;
+  overflow: visible;
 }
 
 .container-snap {
@@ -89,12 +91,9 @@ body::before {
   height: 100vh;
   height: 100dvh;
 }
-
-/* На мобилке: пейджер — один блок на экран, при скролле привязка к секции. proximity: в Compare не откидывает назад */
-@media (max-width: 1023px) {
-  .container-snap {
-    scroll-snap-type: y proximity;
-  }
+/* Внутри Compare отключаем snap при скролле вниз — чтобы свайп не отбрасывал назад рывком */
+#scroll-container[data-snap-disabled="true"] {
+  scroll-snap-type: none;
 }
 
 /* Hide scrollbar for horizontal nav on mobile */

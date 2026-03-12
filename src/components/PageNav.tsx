@@ -43,6 +43,7 @@ export function PageNav() {
     const timeouts: ReturnType<typeof setTimeout>[] = [];
 
     function run(container: HTMLElement) {
+      const compareEl = document.getElementById("compare");
       const handleScroll = () => {
         raf = requestAnimationFrame(() => {
           const sections = container.querySelectorAll<HTMLElement>("[data-section]");
@@ -58,6 +59,13 @@ export function PageNav() {
           if (current !== lastActiveRef.current) {
             lastActiveRef.current = current;
             setActiveId(current);
+          }
+          if (compareEl && current === "compare") {
+            const compareRect = compareEl.getBoundingClientRect();
+            const scrolledIntoCompare = compareRect.top < -80;
+            container.setAttribute("data-snap-disabled", scrolledIntoCompare ? "true" : "false");
+          } else {
+            container.removeAttribute("data-snap-disabled");
           }
         });
       };

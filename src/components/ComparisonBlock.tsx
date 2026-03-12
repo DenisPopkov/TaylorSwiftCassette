@@ -172,9 +172,9 @@ export function ComparisonBlock() {
     <section
       id="compare"
       data-section="compare"
-      className="section flex flex-col items-center justify-center min-h-screen py-16 sm:py-20 md:py-24 lg:py-28 pb-24 px-4 sm:px-6 lg:px-24"
+      className="section flex flex-col items-center py-16 sm:py-20 md:py-24 lg:py-28 pb-32 px-4 sm:px-6 lg:px-24"
     >
-      <div className="w-full max-w-2xl mx-auto relative z-10">
+      <div className="w-full max-w-2xl mx-auto relative z-10 flex-shrink-0">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading text-[#e8e6e3] uppercase tracking-wider text-center mb-4">
           Cassette Comparison
         </h2>
@@ -222,17 +222,15 @@ export function ComparisonBlock() {
                 aria-label={`Source ${label}`}
               >
                 <span
-                  className="w-[56px] h-[32px] sm:w-[80px] sm:h-[50px] flex items-center justify-center overflow-hidden shrink-0 rounded border border-[#e8e6e3]/10 bg-[#0b0b0b]/80"
+                  className="w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden shrink-0 rounded border border-[#e8e6e3]/10 bg-[#0b0b0b]/80"
                 >
                   <img
                     src={CASSETTE_IMAGES[id] ?? CASSETTE_IMAGES["type-i"]}
                     alt=""
-                    className="pointer-events-none object-contain"
+                    className="pointer-events-none object-contain w-full h-full"
                     style={{
-                      maxWidth: id === "original" ? "75%" : "100%",
-                      maxHeight: id === "original" ? "75%" : "100%",
-                      width: "auto",
-                      height: "auto",
+                      objectFit: "contain",
+                      ...(id === "original" ? { maxWidth: "75%", maxHeight: "75%" } : {}),
                     }}
                   />
                 </span>
