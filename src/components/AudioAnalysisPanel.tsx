@@ -11,7 +11,6 @@ import {
 const ANALYSIS_TYPES = [
   { id: "waveform", label: "Waveform" },
   { id: "spectrum", label: "Frequency Spectrum" },
-  { id: "spectrogram", label: "Spectrogram" },
 ] as const;
 
 type AnalysisTypeId = (typeof ANALYSIS_TYPES)[number]["id"];
@@ -180,37 +179,6 @@ export function AudioAnalysisPanel({
         ctx.stroke();
       });
       drawAxisLabels("Frequency (Hz)", "Amplitude");
-    } else if (analysisType === "spectrogram") {
-      const d = dataByFormulation[formulation];
-      ctx.fillStyle = "#0b0b0b";
-      ctx.fillRect(0, 0, cw, ch);
-      if (d && d.spectrogram.length > 0) {
-        const rows = d.spectrogram.length;
-        const bins = d.spectrogram[0].length;
-        let max = 0;
-        for (let r = 0; r < rows; r++) {
-          for (let b = 0; b < bins; b++) {
-            if (d.spectrogram[r][b] > max) max = d.spectrogram[r][b];
-          }
-        }
-        if (max <= 0) max = 1;
-        const cellW = W / rows;
-        const cellH = H / bins;
-        for (let r = 0; r < rows; r++) {
-          for (let b = 0; b < bins; b++) {
-            const v = d.spectrogram[r][b] / max;
-            const gray = Math.round(20 + v * 235);
-            ctx.fillStyle = `rgb(${gray},${gray},${gray})`;
-            ctx.fillRect(
-              leftPad + r * cellW,
-              topPad + H - (b + 1) * cellH,
-              cellW + 1,
-              cellH + 1
-            );
-          }
-        }
-      }
-      drawAxisLabels("Time (s)", "Frequency (Hz)");
     }
   }, [
     hasData,
@@ -267,7 +235,7 @@ export function AudioAnalysisPanel({
       )}
       {!loading && !error && hasData && (
         <>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 mb-2 transition-colors duration-200">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mb-2 transition-colors duration-200">
             {COMPARISON_FORMULATIONS.map((f) => {
               const isActive = f.id === formulation;
               return (

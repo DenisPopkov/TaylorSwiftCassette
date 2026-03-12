@@ -4,13 +4,11 @@ import { magnitudeSpectrum } from "./fft";
 // Визуально качество остаётся приемлемым, а расчёты становятся заметно легче.
 const FFT_SIZE = 1024;
 const SPECTRUM_HOP = 1024;
-const SPECTROGRAM_HOP = 1024;
 const WAVEFORM_POINTS = 900;
 
 export type AnalysisResult = {
   waveform: Float32Array;
   spectrum: Float32Array;
-  spectrogram: Float32Array[]; // each row = spectrum at a time slice
   duration: number;
   sampleRate: number;
 };
@@ -33,17 +31,7 @@ export async function analyzeAudioFromUrl(url: string): Promise<AnalysisResult> 
       const waveform = downsample(channel, WAVEFORM_POINTS);
       const spectrum = averageSpectrum(channel, FFT_SIZE, SPECTRUM_HOP);
 
-      const spectrogram: Float32Array[] = [];
-      for (
-        let start = 0;
-        start + FFT_SIZE <= channel.length;
-        start += SPECTROGRAM_HOP
-      ) {
-        const slice = channel.subarray(start, start + FFT_SIZE);
-        spectrogram.push(magnitudeSpectrum(slice, FFT_SIZE));
-      }
-
-      return { waveform, spectrum, spectrogram, duration, sampleRate };
+      return { waveform, spectrum, duration, sampleRate };
     })();
     analysisCache.set(url, promise);
   }

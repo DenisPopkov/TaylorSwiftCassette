@@ -139,8 +139,16 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
                 }`}
               >
                 {currentIndex === i && (
-                  <span className="text-[#e8e6e3] shrink-0" aria-hidden>
-                    {playing ? "▌▌" : "▶"}
+                  <span className="text-[#e8e6e3] shrink-0 w-4 h-4 flex items-center justify-center" aria-hidden>
+                    {playing ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7L8 5z" />
+                      </svg>
+                    )}
                   </span>
                 )}
                 {t.title}
@@ -164,8 +172,16 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
                   }`}
                 >
                   {currentIndex === idx && (
-                    <span className="text-[#e8e6e3] shrink-0" aria-hidden>
-                      {playing ? "▌▌" : "▶"}
+                    <span className="text-[#e8e6e3] shrink-0 w-4 h-4 flex items-center justify-center" aria-hidden>
+                      {playing ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                        </svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7L8 5z" />
+                        </svg>
+                      )}
                     </span>
                   )}
                   {t.title}
@@ -176,7 +192,13 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
         </ul>
 
         <p className="text-[#e8e6e3] font-heading text-sm mb-4 truncate flex items-center gap-2" title={track?.title}>
-          {playing && <span className="shrink-0" aria-hidden>►</span>}
+          {playing && (
+            <span className="shrink-0 w-4 h-4 flex items-center justify-center" aria-hidden>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+              </svg>
+            </span>
+          )}
           {track?.title}
         </p>
 

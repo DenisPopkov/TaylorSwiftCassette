@@ -14,13 +14,8 @@ const SECTIONS = [
 
 function scrollToSection(id: string) {
   const el = document.getElementById(id);
-  const container = document.getElementById("scroll-container");
-  if (!el || !container) return;
-  const cont = container as HTMLElement;
-  const rect = el.getBoundingClientRect();
-  const contRect = cont.getBoundingClientRect();
-  const targetScrollTop = cont.scrollTop + (rect.top - contRect.top);
-  cont.scrollTo({ top: targetScrollTop, behavior: "smooth" });
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 export function PageNav() {

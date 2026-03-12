@@ -30,7 +30,8 @@ body {
   height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 8rem; /* чтобы последний блок (Compare) доскролливался до конца */
+  /* Нижний отступ: Compare высокий + нижний навбар; на lg сбрасывается ниже */
+  padding-bottom: calc(12rem + env(safe-area-inset-bottom, 0));
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
   /* hide scrollbar so layout doesn’t “shift” */
@@ -43,6 +44,9 @@ body {
 @media (min-width: 1024px) {
   #scroll-container {
     padding-bottom: 0;
+    /* Правый отступ под навбар; левый — сдвиг блока вправо к визуальному центру дисплея */
+    padding-left: 10.5rem;
+    padding-right: 17.25rem; /* 96px + 180px (ширина навбара) */
   }
 }
 
@@ -64,16 +68,18 @@ body::before {
   vertical-align: 0.12em;
 }
 
-/* Full-page sections: 100dvh на мобильных, чтобы не «подглядывал» следующий блок */
+/* Full-page sections + отступ при scrollIntoView по табам (контент не под шапкой) */
 .section {
   min-height: 100vh;
   min-height: 100dvh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  scroll-margin-top: 1rem;
 }
 
-/* Последняя секция (Compare): не привязывать скролл к началу, чтобы можно было доскроллить до конца */
+/* Compare: точка привязки в начале — удобно доскроллить с Original; scroll-snap-stop: normal — внутри секции можно свободно листать */
 #compare.section {
+  scroll-snap-align: start;
   scroll-snap-stop: normal;
 }
 
@@ -82,6 +88,13 @@ body::before {
   overflow-y: scroll;
   height: 100vh;
   height: 100dvh;
+}
+
+/* На мобилке: пейджер — один блок на экран, при скролле привязка к секции. proximity: в Compare не откидывает назад */
+@media (max-width: 1023px) {
+  .container-snap {
+    scroll-snap-type: y proximity;
+  }
 }
 
 /* Hide scrollbar for horizontal nav on mobile */

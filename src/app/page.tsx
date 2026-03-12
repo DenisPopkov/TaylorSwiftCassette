@@ -51,7 +51,7 @@ export default function Home() {
       <section
         id="intro"
         data-section="intro"
-        className="section flex flex-col items-center justify-center py-16 sm:py-20 md:py-24"
+        className="section flex flex-col items-center justify-center pt-12 pb-16 sm:pt-16 sm:pb-20 md:pt-20 md:pb-24"
       >
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading text-[#e8e6e3] uppercase tracking-wider mb-6 sm:mb-8">

@@ -186,19 +186,19 @@ export function ComparisonBlock() {
         </p>
 
         {/* Source: блок с фоном для ясности */}
-        <div className="rounded-md border border-[#e8e6e3]/15 bg-[#0b0b0b]/60 px-4 py-5 mb-8">
-          <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-3">
+        <div className="rounded-md border border-[#e8e6e3]/15 bg-[#0b0b0b]/60 px-3 py-4 sm:px-4 sm:py-5 mb-6 sm:mb-8">
+          <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2 sm:mb-3">
             Source
           </p>
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-3 mb-4 sm:mb-6">
             {COMPARISON_FORMULATIONS.map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => switchFormulation(id)}
-                className={`min-h-[44px] px-4 py-2 border font-heading text-xs uppercase tracking-widest transition-all ${
+                className={`min-h-[40px] sm:min-h-[44px] px-2.5 sm:px-4 py-1.5 sm:py-2 border font-heading text-[10px] sm:text-xs uppercase tracking-widest transition-all shrink-0 ${
                   formulation === id
-                    ? "border-[#e8e6e3] bg-[#e8e6e3]/15 text-[#e8e6e3] scale-105"
+                    ? "border-[#e8e6e3] bg-[#e8e6e3]/15 text-[#e8e6e3] sm:scale-105"
                     : "border-[#e8e6e3]/40 text-[#9f9f9f] hover:border-[#e8e6e3]/60 hover:text-[#e8e6e3]"
                 }`}
               >
@@ -207,14 +207,14 @@ export function ComparisonBlock() {
             ))}
           </div>
 
-          {/* 5 кассет — фиксированный контейнер на каждую, фон ячейки */}
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+          {/* 5 кассет — на мобилке горизонтальный скролл при нехватке места */}
+          <div className="flex flex-nowrap sm:flex-wrap justify-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide -mx-1 px-1 sm:mx-0 sm:overflow-visible">
             {COMPARISON_FORMULATIONS.map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => switchFormulation(id)}
-                className={`flex flex-col items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8e6e3] rounded p-2 transition-opacity ${
+                className={`flex flex-col items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8e6e3] rounded p-1.5 sm:p-2 transition-opacity shrink-0 ${
                   formulation === id
                     ? "opacity-100 bg-[#e8e6e3]/5"
                     : "opacity-80 hover:opacity-100 bg-[#e8e6e3]/[0.03]"
@@ -222,8 +222,7 @@ export function ComparisonBlock() {
                 aria-label={`Source ${label}`}
               >
                 <span
-                  className="w-[70px] h-[40px] sm:w-[80px] sm:h-[50px] flex items-center justify-center overflow-hidden shrink-0 rounded border border-[#e8e6e3]/10 bg-[#0b0b0b]/80"
-                  style={{ minWidth: 70, minHeight: 40 }}
+                  className="w-[56px] h-[32px] sm:w-[80px] sm:h-[50px] flex items-center justify-center overflow-hidden shrink-0 rounded border border-[#e8e6e3]/10 bg-[#0b0b0b]/80"
                 >
                   <img
                     src={CASSETTE_IMAGES[id] ?? CASSETTE_IMAGES["type-i"]}
@@ -237,7 +236,7 @@ export function ComparisonBlock() {
                     }}
                   />
                 </span>
-                <span className="text-[10px] sm:text-xs font-heading uppercase tracking-wider text-[#9f9f9f]">
+                <span className="text-[9px] sm:text-xs font-heading uppercase tracking-wider text-[#9f9f9f]">
                   {label}
                 </span>
               </button>
@@ -245,20 +244,20 @@ export function ComparisonBlock() {
           </div>
         </div>
 
-        {/* Track */}
+        {/* Track: на мобилке — вертикальный список (все треки влазят), на sm+ — ряд с переносом */}
         <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2">
           Track
         </p>
-        <div className="flex flex-wrap justify-center gap-2 mb-6 text-center">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-center gap-1.5 sm:gap-2 mb-6 text-left sm:text-center min-w-0">
           {TTPD_TRACKS.map((t, i) => (
             <button
               key={t.id}
               type="button"
               onClick={() => selectTrack(i)}
-              className={`px-3 py-2 font-heading text-sm transition-colors ${
+              className={`w-full sm:w-auto px-3 py-2.5 sm:py-2 font-heading text-sm text-left sm:text-center truncate sm:whitespace-normal border transition-colors ${
                 trackIndex === i
-                  ? "bg-[#e8e6e3]/15 text-[#e8e6e3] border border-[#e8e6e3]/40"
-                  : "text-[#9f9f9f] hover:text-[#e8e6e3] border border-transparent"
+                  ? "bg-[#e8e6e3]/15 text-[#e8e6e3] border-[#e8e6e3]/40"
+                  : "text-[#9f9f9f] hover:text-[#e8e6e3] border-transparent"
               }`}
             >
               {t.title}

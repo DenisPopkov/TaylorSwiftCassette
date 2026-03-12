@@ -31,10 +31,10 @@ export function CassetteBlock({
     <section
       id={id}
       data-section={id}
-      className="section flex items-center justify-center min-h-screen px-4 sm:px-8 py-12 sm:py-20 md:py-24 lg:py-28 lg:px-16"
+      className="section flex items-center justify-center min-h-screen px-4 sm:px-8 py-12 sm:py-16 md:py-20 lg:py-24 lg:px-24"
     >
-      <div className="w-full max-w-[1100px] mx-auto min-w-0 flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[260px_360px_220px] gap-5 sm:gap-8 md:gap-10 lg:gap-12 items-center md:items-start lg:items-center w-full lg:w-[936px] lg:max-w-[calc(100vw-2rem)] lg:shrink-0 lg:mx-auto">
+      <div className="w-full max-w-[1100px] mx-auto min-w-0 flex justify-center items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[240px_360px_240px] gap-5 sm:gap-8 md:gap-10 lg:gap-12 items-center md:items-start lg:items-center w-full lg:w-[936px] lg:max-w-none lg:shrink-0 lg:mx-auto">
           <div className="order-1 text-center md:text-left min-w-0 md:max-w-[90%] lg:max-w-[280px] lg:justify-self-end">
             <h2 className="text-lg sm:text-2xl md:text-2xl lg:text-3xl font-heading text-[#f2f2f2] uppercase tracking-[0.2em] mb-3 sm:mb-6 max-w-[20ch] leading-tight mx-auto md:mx-0">
               {titleParts ? (
@@ -61,7 +61,7 @@ export function CassetteBlock({
             />
           </div>
 
-          <div className="order-3 flex flex-col text-center md:text-left w-full min-w-0 lg:max-w-[240px] lg:w-auto lg:justify-self-start pt-6 sm:pt-10 md:pt-12 lg:pt-0 border-t lg:border-t-0 border-[#e8e6e3]/15 lg:border-l lg:pl-6">
+          <div className="order-3 hidden lg:flex flex-col text-center md:text-left w-full min-w-0 lg:max-w-[240px] lg:w-auto lg:justify-self-start pt-6 sm:pt-10 md:pt-12 lg:pt-0 border-t lg:border-t-0 border-[#e8e6e3]/15 lg:border-l lg:pl-6">
             <p className="text-[#9f9f9f] text-xs uppercase tracking-widest mb-2">
               Experiment
             </p>
