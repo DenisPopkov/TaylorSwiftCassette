@@ -31,12 +31,12 @@ export function CassetteBlock({
     <section
       id={id}
       data-section={id}
-      className="section flex items-center justify-center min-h-screen px-4 sm:px-8 py-12 sm:py-16 md:py-20 lg:py-24 lg:px-24"
+      className="section flex items-center xl:items-start justify-center min-h-screen px-4 sm:px-8 pt-20 sm:pt-24 md:pt-24 lg:pt-24 xl:pt-36 pb-12 sm:pb-16 md:pb-20 lg:pb-24 lg:px-16 xl:px-24"
     >
-      <div className="w-full max-w-[1100px] mx-auto min-w-0 flex justify-center items-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[240px_360px_240px] gap-5 sm:gap-8 md:gap-10 lg:gap-12 items-center md:items-start lg:items-center w-full lg:w-[936px] lg:max-w-none lg:shrink-0 lg:mx-auto">
-          <div className="order-1 text-center md:text-left min-w-0 md:max-w-[90%] lg:max-w-[280px] lg:justify-self-end">
-            <h2 className="text-lg sm:text-2xl md:text-2xl lg:text-3xl font-heading text-[#f2f2f2] uppercase tracking-[0.2em] mb-3 sm:mb-6 max-w-[20ch] leading-tight mx-auto md:mx-0">
+      <div className="w-full max-w-[1100px] mx-auto min-w-0 flex justify-center items-center xl:items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-[240px_360px_240px] gap-5 sm:gap-8 xl:gap-12 items-center xl:items-start w-full xl:w-[936px] xl:max-w-none xl:shrink-0 xl:mx-auto">
+          <div className="order-1 text-center xl:text-left min-w-0 xl:max-w-[280px] xl:justify-self-end">
+            <h2 className="text-lg sm:text-2xl md:text-2xl lg:text-3xl font-heading text-[#f2f2f2] uppercase tracking-[0.2em] mb-3 sm:mb-6 max-w-[20ch] leading-tight mx-auto xl:mx-0">
               {titleParts ? (
                 <>
                   {titleParts[0]}
@@ -52,7 +52,7 @@ export function CassetteBlock({
             </div>
           </div>
 
-          <div className="order-2 flex flex-col items-center justify-center gap-3 sm:gap-6 w-full max-w-[240px] sm:max-w-[308px] md:max-w-[360px] min-w-0 sm:w-[308px] md:w-[360px] shrink-0 md:justify-self-center md:min-w-[360px] mx-auto">
+          <div className="order-2 flex flex-col items-center justify-center gap-3 sm:gap-6 w-full max-w-[240px] sm:max-w-[308px] xl:max-w-[360px] min-w-0 sm:w-[308px] xl:w-[360px] shrink-0 xl:min-w-[360px] mx-auto">
             <CassetteImage
               src={imageSrc}
               alt={cassetteLabel}
@@ -61,7 +61,7 @@ export function CassetteBlock({
             />
           </div>
 
-          <div className="order-3 hidden lg:flex flex-col text-center md:text-left w-full min-w-0 lg:max-w-[240px] lg:w-auto lg:justify-self-start pt-6 sm:pt-10 md:pt-12 lg:pt-0 border-t lg:border-t-0 border-[#e8e6e3]/15 lg:border-l lg:pl-6">
+          <div className="order-3 hidden xl:flex flex-col text-center md:text-left w-full min-w-0 xl:max-w-[240px] xl:w-auto xl:justify-self-start pt-6 sm:pt-10 md:pt-12 xl:pt-0 border-t xl:border-t-0 border-[#e8e6e3]/15 xl:border-l xl:pl-6">
             <p className="text-[#9f9f9f] text-xs uppercase tracking-widest mb-2">
               Experiment
             </p>

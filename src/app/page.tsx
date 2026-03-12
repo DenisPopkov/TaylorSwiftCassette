@@ -44,7 +44,7 @@ export default function Home() {
     <main
       id="scroll-container"
       ref={containerRef}
-      className="container-snap w-full px-4 sm:px-6 lg:px-24 z-0 relative"
+      className="container-snap w-full px-4 sm:px-6 lg:px-8 xl:px-24 z-0 relative"
     >
       {/* Block 0 — Intro */}
       <section

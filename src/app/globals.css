@@ -41,12 +41,24 @@ body {
 #scroll-container::-webkit-scrollbar {
   display: none;
 }
-@media (min-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
+  #scroll-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+/* lg: iPad — симметричные отступы, контент по центру всего экрана; навбар просто нависает справа */
+@media (min-width: 1024px) and (max-width: 1279px) {
   #scroll-container {
     padding-bottom: 0;
-    /* Правый отступ под навбар; левый — сдвиг блока вправо к визуальному центру дисплея */
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+@media (min-width: 1280px) {
+  #scroll-container {
     padding-left: 10.5rem;
-    padding-right: 17.25rem; /* 96px + 180px (ширина навбара) */
+    padding-right: 17.25rem;
   }
 }
 
@@ -77,12 +89,14 @@ body::before {
   scroll-margin-top: 1rem;
 }
 
-/* Compare: высота по контенту (не 100vh), чтобы весь блок доскролливался; scroll-snap-stop: normal — внутри листается свободно */
+/* Compare: минимум на весь экран + вертикальное центрирование блока; scroll-snap-stop: normal */
 #compare.section {
-  min-height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
   scroll-snap-align: start;
   scroll-snap-stop: normal;
   overflow: visible;
+  scroll-margin-top: 5rem; /* на мобилке блок не заезжает под фиксированную шапку */
 }
 
 .container-snap {

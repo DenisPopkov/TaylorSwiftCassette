@@ -131,14 +131,14 @@ export function PageNav() {
 
   return (
     <>
-      {/* Полоса справа только на desktop (lg), на мобильных не занимаем место */}
+      {/* Полоса справа только на больших десктопах (xl+), на iPad не показываем */}
       <div
-        className="hidden lg:block fixed inset-y-0 right-0 w-[180px] z-[9999] pointer-events-none"
+        className="hidden xl:block fixed inset-y-0 right-0 w-[180px] z-[9999] pointer-events-none"
         aria-hidden
       >
       {/* Боковое меню — только на desktop; на мобильных не показываем, чтобы не перекрывать контент */}
       <nav
-        className="hidden lg:block fixed top-1/2 right-0 min-w-[140px] pl-4 pr-6 py-2 -translate-y-1/2 pointer-events-auto"
+        className="hidden xl:block fixed top-1/2 right-0 min-w-[140px] pl-4 pr-6 py-2 -translate-y-1/2 pointer-events-auto"
         aria-label="Section navigation"
       >
         <ul className="space-y-0 text-right">
@@ -146,9 +146,9 @@ export function PageNav() {
         </ul>
       </nav>
     </div>
-    {/* Нижний навбар на мобильных — без переноса подписей (TYPE I в одну строку), горизонтальный скролл при нехватке места */}
+    {/* Нижний навбар на мобильных и на iPad — без переноса подписей (TYPE I в одну строку), горизонтальный скролл при нехватке места */}
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10 pointer-events-auto z-[9999] pb-[env(safe-area-inset-bottom)]"
+      className="xl:hidden fixed bottom-0 left-0 right-0 bg-[#0b0b0b]/95 backdrop-blur-sm border-t border-[#e8e6e3]/10 pointer-events-auto z-[9999] pb-[env(safe-area-inset-bottom)]"
       aria-label="Section navigation (mobile)"
     >
       <ul className="flex items-center justify-center flex-nowrap gap-2 overflow-x-auto overflow-y-hidden px-2 py-2.5 scrollbar-hide [&_button]:whitespace-nowrap [&_button]:flex-shrink-0 [&_button]:text-[10px] [&_button]:min-w-0 [&_button]:px-2 sm:[&_button]:text-xs sm:[&_button]:px-2.5">

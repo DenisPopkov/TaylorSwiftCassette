@@ -172,9 +172,9 @@ export function ComparisonBlock() {
     <section
       id="compare"
       data-section="compare"
-      className="section flex flex-col items-center py-16 sm:py-20 md:py-24 lg:py-28 pb-32 px-4 sm:px-6 lg:px-24"
+      className="section flex flex-col items-center justify-center min-h-screen pt-16 pb-24 px-4 sm:px-6 md:px-10 lg:py-12 lg:pt-12 lg:pb-24 xl:px-24"
     >
-      <div className="w-full max-w-2xl mx-auto relative z-10 flex-shrink-0">
+      <div className="w-full max-w-2xl md:max-w-4xl mx-auto relative z-10 flex-shrink-0 min-h-[200px]">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading text-[#e8e6e3] uppercase tracking-wider text-center mb-4">
           Cassette Comparison
         </h2>
@@ -207,8 +207,8 @@ export function ComparisonBlock() {
             ))}
           </div>
 
-          {/* 5 кассет — на мобилке горизонтальный скролл при нехватке места */}
-          <div className="flex flex-nowrap sm:flex-wrap justify-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide -mx-1 px-1 sm:mx-0 sm:overflow-visible">
+          {/* 5 кассет — на мобилке горизонтальный скролл; pl/pr чтобы первый и последний не обрезались */}
+          <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide pl-3 pr-3 sm:pl-0 sm:pr-0 sm:overflow-visible -mx-1 sm:mx-0">
             {COMPARISON_FORMULATIONS.map(({ id, label }) => (
               <button
                 key={id}
