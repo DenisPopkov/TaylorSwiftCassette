@@ -23,13 +23,12 @@ export default function Home() {
           gsap.from(section, {
             scrollTrigger: {
               trigger: section,
-              start: "top 80%",
-              end: "top 20%",
-              scrub: 0.5,
+              start: "top 85%",
+              end: "top 25%",
+              scrub: 0.4,
             },
-            opacity: 0.6,
-            y: 40,
-            duration: 0.8,
+            y: 24,
+            duration: 0.6,
           });
         });
         kill = () => ScrollTrigger.getAll().forEach((t) => t.kill());
