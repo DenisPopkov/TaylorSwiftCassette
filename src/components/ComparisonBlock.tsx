@@ -230,7 +230,11 @@ export function ComparisonBlock() {
                     className="pointer-events-none object-contain w-full h-full"
                     style={{
                       objectFit: "contain",
-                      ...(id === "original" ? { maxWidth: "75%", maxHeight: "75%" } : {}),
+                      ...(id === "original"
+                        ? { maxWidth: "75%", maxHeight: "75%" }
+                        : id === "type-i"
+                          ? { maxWidth: "92%", maxHeight: "92%" }
+                          : {}),
                     }}
                   />
                 </span>

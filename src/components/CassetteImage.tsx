@@ -38,10 +38,14 @@ export function CassetteImage({
         </svg>
         <span>Play cassette</span>
       </button>
-      {/* Original принудительно уменьшаем (75%), чтобы визуально совпадал с Type I–IV */}
+      {/* Original — уменьшаем (75%). Type I — подгон под размер II–IV. */}
       <div
-        className={`relative w-[200px] h-[200px] sm:w-[308px] sm:h-[308px] md:w-[360px] md:h-[360px] shrink-0 overflow-hidden mx-auto ${
-          variant === "original" ? "scale-[0.75] origin-center" : ""
+        className={`relative w-[200px] h-[200px] sm:w-[308px] sm:h-[308px] md:w-[360px] md:h-[360px] shrink-0 overflow-hidden mx-auto origin-center ${
+          variant === "original"
+            ? "scale-[0.75]"
+            : variant === "type-i"
+              ? "scale-[0.92]"
+              : ""
         }`}
       >
         <Image
