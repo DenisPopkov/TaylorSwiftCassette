@@ -23,20 +23,22 @@ const LINE_COLORS: Record<FormulationId, string> = {
   original: "rgba(232, 230, 227, 0.95)",
 };
 const ACTIVE_LINE_COLOR = "#e8e6e3";
-const FFT_SIZE = 2048;
 
 type Props = {
   trackIndex: number;
   formulation: FormulationId;
   trackTitle: string;
   isOpen: boolean;
+  onClose: () => void;
   onFormulationChange?: (id: FormulationId) => void;
 };
 
 export function AudioAnalysisPanel({
   trackIndex,
   formulation,
+  trackTitle,
   isOpen,
+  onClose,
   onFormulationChange,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -54,16 +56,12 @@ export function AudioAnalysisPanel({
     setDataByFormulation({} as Record<FormulationId, AnalysisResult | null>);
     try {
       const entries: [FormulationId, AnalysisResult][] = [];
-      // Считаем формулы последовательно, чтобы не блокировать UI пиком нагрузки
       for (const f of COMPARISON_FORMULATIONS) {
         const url = getComparisonSrc(trackIndex, f.id);
         const result = await analyzeAudioFromUrl(url);
         entries.push([f.id, result]);
       }
-      const next: Record<FormulationId, AnalysisResult | null> = {} as Record<
-        FormulationId,
-        AnalysisResult | null
-      >;
+      const next = {} as Record<FormulationId, AnalysisResult | null>;
       entries.forEach(([id, result]) => {
         next[id] = result;
       });
@@ -81,14 +79,14 @@ export function AudioAnalysisPanel({
     loadAllAnalyses();
   }, [isOpen, loadAllAnalyses]);
 
-  const hasData = COMPARISON_FORMULATIONS.some(
-    (f) => dataByFormulation[f.id] != null
-  );
-  const refResult = COMPARISON_FORMULATIONS.find(
-    (f) => dataByFormulation[f.id] != null
-  );
-  const sampleRate = refResult ? dataByFormulation[refResult.id]!.sampleRate : 44100;
-  const duration = refResult ? dataByFormulation[refResult.id]!.duration : 0;
+  useEffect(() => {
+    if (!isOpen) return;
+    document.documentElement.classList.add("lock-scroll");
+    return () => document.documentElement.classList.remove("lock-scroll");
+  }, [isOpen]);
+
+  const hasData = COMPARISON_FORMULATIONS.some((f) => dataByFormulation[f.id] != null);
+  const refResult = COMPARISON_FORMULATIONS.find((f) => dataByFormulation[f.id] != null);
 
   useEffect(() => {
     if (!hasData || !canvasRef.current) return;
@@ -108,17 +106,17 @@ export function AudioAnalysisPanel({
     const bottomPad = 28;
     const rightPad = 10;
     const topPad = 10;
-    const W = cw - leftPad - rightPad;
-    const H = ch - topPad - bottomPad;
+    const width = cw - leftPad - rightPad;
+    const height = ch - topPad - bottomPad;
 
     const drawAxisLabels = (xLabel: string, yLabel: string) => {
       ctx.save();
       ctx.fillStyle = "#9f9f9f";
       ctx.font = "11px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(xLabel, leftPad + W / 2, ch - 6);
+      ctx.fillText(xLabel, leftPad + width / 2, ch - 6);
       ctx.save();
-      ctx.translate(12, topPad + H / 2);
+      ctx.translate(12, topPad + height / 2);
       ctx.rotate(-Math.PI / 2);
       ctx.textAlign = "center";
       ctx.fillText(yLabel, 0, 0);
@@ -127,12 +125,9 @@ export function AudioAnalysisPanel({
     };
 
     if (analysisType === "waveform") {
-      ctx.fillStyle = "#0b0b0b";
-      ctx.fillRect(0, 0, cw, ch);
-      const midY = topPad + H / 2;
-      const len = refResult
-        ? dataByFormulation[refResult.id]!.waveform.length
-        : 0;
+      ctx.clearRect(0, 0, cw, ch);
+      const midY = topPad + height / 2;
+      const len = refResult ? dataByFormulation[refResult.id]!.waveform.length : 0;
       if (len > 0) {
         COMPARISON_FORMULATIONS.forEach((f) => {
           const d = dataByFormulation[f.id];
@@ -143,8 +138,8 @@ export function AudioAnalysisPanel({
           ctx.beginPath();
           const pts = d.waveform;
           for (let i = 0; i < pts.length; i++) {
-            const x = leftPad + (i / (pts.length - 1)) * W;
-            const y = midY - pts[i] * (H / 2);
+            const x = leftPad + (i / (pts.length - 1)) * width;
+            const y = midY - pts[i] * (height / 2);
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
@@ -152,16 +147,17 @@ export function AudioAnalysisPanel({
         });
       }
       drawAxisLabels("Time (s)", "Amplitude");
-    } else if (analysisType === "spectrum") {
-      ctx.fillStyle = "#0b0b0b";
-      ctx.fillRect(0, 0, cw, ch);
+    } else {
+      ctx.clearRect(0, 0, cw, ch);
       let globalMax = 0;
       COMPARISON_FORMULATIONS.forEach((f) => {
         const d = dataByFormulation[f.id];
-        if (d) for (let i = 0; i < d.spectrum.length; i++) if (d.spectrum[i] > globalMax) globalMax = d.spectrum[i];
+        if (!d) return;
+        for (let i = 0; i < d.spectrum.length; i++) {
+          if (d.spectrum[i] > globalMax) globalMax = d.spectrum[i];
+        }
       });
       if (globalMax <= 0) globalMax = 1;
-      const binCount = refResult ? dataByFormulation[refResult.id]!.spectrum.length : 0;
       COMPARISON_FORMULATIONS.forEach((f) => {
         const d = dataByFormulation[f.id];
         if (!d || d.spectrum.length === 0) return;
@@ -170,9 +166,9 @@ export function AudioAnalysisPanel({
         ctx.lineWidth = isActive ? 2.5 : 1;
         ctx.beginPath();
         for (let i = 0; i < d.spectrum.length; i++) {
-          const x = leftPad + (i / (d.spectrum.length - 1)) * W;
-          const barH = (d.spectrum[i] / globalMax) * H;
-          const y = topPad + H - barH;
+          const x = leftPad + (i / (d.spectrum.length - 1)) * width;
+          const barHeight = (d.spectrum[i] / globalMax) * height;
+          const y = topPad + height - barHeight;
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -180,94 +176,109 @@ export function AudioAnalysisPanel({
       });
       drawAxisLabels("Frequency (Hz)", "Amplitude");
     }
-  }, [
-    hasData,
-    dataByFormulation,
-    formulation,
-    analysisType,
-    refResult,
-    isOpen,
-  ]);
+  }, [analysisType, dataByFormulation, formulation, hasData, refResult]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="border border-[#e8e6e3]/20 bg-[#0b0b0b]/80 p-6 mt-8">
-      <h3 className="text-lg font-heading text-[#e8e6e3] uppercase tracking-wider mb-2">
-        Audio Analysis
-      </h3>
-      <p className="text-[#c8c8c8] font-serif text-sm leading-[1.6] mb-1">
-        Visual comparison of the recording across different cassette tape formulations.
-      </p>
-      <p className="text-[#c8c8c8]/80 font-serif text-sm leading-[1.6] mb-4">
-        The graphs highlight frequency response, dynamic range and noise characteristics introduced by each tape type.
-      </p>
-
-      <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2">
-        Analysis type
-      </p>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {ANALYSIS_TYPES.map(({ id, label }) => (
+    <div
+      className="fixed inset-0 z-[10010] flex items-center justify-center bg-transparent p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-4xl max-h-[85vh] overflow-y-auto border border-[#e8e6e3]/20 bg-[#0b0b0b] p-6 md:p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-end items-center mb-4">
           <button
-            key={id}
             type="button"
-            onClick={() => setAnalysisType(id)}
-            className={`min-h-[40px] px-4 py-2 border font-heading text-xs uppercase tracking-widest transition-colors ${
-              analysisType === id
-                ? "border-[#e8e6e3] bg-[#e8e6e3]/10 text-[#e8e6e3]"
-                : "border-[#e8e6e3]/40 text-[#9f9f9f] hover:text-[#e8e6e3]"
-            }`}
+            onClick={onClose}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-[#9f9f9f] hover:text-[#e8e6e3] text-3xl sm:text-4xl leading-none -mr-2"
+            aria-label="Close analysis"
           >
-            {label}
+            x
           </button>
-        ))}
-      </div>
+        </div>
 
-      {loading && (
-        <div className="h-[260px] flex items-center justify-center text-[#9f9f9f] font-serif">
-          Analyzing all formulations…
+        <h3 className="text-lg font-heading text-[#e8e6e3] uppercase tracking-wider mb-2">
+          Audio Analysis
+        </h3>
+        <p className="text-[#e8e6e3] font-heading text-xs uppercase tracking-widest mb-1">
+          {trackTitle}
+        </p>
+        <p className="text-[#c8c8c8] font-serif text-sm leading-[1.6] mb-1">
+          Visual comparison of the recording across different cassette tape formulations.
+        </p>
+        <p className="text-[#c8c8c8]/80 font-serif text-sm leading-[1.6] mb-4">
+          The graphs highlight frequency response, dynamic range and noise characteristics introduced by each tape type.
+        </p>
+
+        <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2">
+          Analysis type
+        </p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {ANALYSIS_TYPES.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setAnalysisType(id)}
+              className={`min-h-[40px] px-4 py-2 border font-heading text-xs uppercase tracking-widest transition-colors ${
+                analysisType === id
+                  ? "border-[#e8e6e3] bg-[#e8e6e3]/10 text-[#e8e6e3]"
+                  : "border-[#e8e6e3]/40 text-[#9f9f9f] hover:text-[#e8e6e3]"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      )}
-      {error && (
-        <div className="h-[120px] flex items-center justify-center text-[#c8c8c8] font-serif">
-          {error}
-        </div>
-      )}
-      {!loading && !error && hasData && (
-        <>
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mb-2 transition-colors duration-200">
-            {COMPARISON_FORMULATIONS.map((f) => {
-              const isActive = f.id === formulation;
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => onFormulationChange?.(f.id)}
-                  disabled={!onFormulationChange}
-                  className={`font-heading text-[10px] uppercase tracking-wider transition-colors duration-200 min-h-[32px] px-1 -mx-1 rounded border border-transparent ${
-                    isActive
-                      ? "text-[#e8e6e3]"
-                      : "text-[#9f9f9f] hover:text-[#e8e6e3] hover:border-[#e8e6e3]/30"
-                  } ${!onFormulationChange ? "cursor-default" : "cursor-pointer"}`}
-                >
-                  {f.label}
-                  {isActive ? " (active)" : ""}
-                </button>
-              );
-            })}
+
+        {loading && (
+          <div className="h-[260px] flex items-center justify-center text-[#9f9f9f] font-serif">
+            Analyzing all formulations...
           </div>
-          <div
-            key={graphKey}
-            className="w-full rounded overflow-hidden border border-[#e8e6e3]/10 analysis-graph-enter"
-          >
-            <canvas
-              ref={canvasRef}
-              className="w-full h-[260px] block"
-              style={{ width: "100%", height: 260 }}
-            />
+        )}
+        {error && (
+          <div className="h-[120px] flex items-center justify-center text-[#c8c8c8] font-serif">
+            {error}
           </div>
-        </>
-      )}
+        )}
+        {!loading && !error && hasData && (
+          <>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mb-2 transition-colors duration-200">
+              {COMPARISON_FORMULATIONS.map((f) => {
+                const isActive = f.id === formulation;
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => onFormulationChange?.(f.id)}
+                    disabled={!onFormulationChange}
+                    className={`font-heading text-[10px] uppercase tracking-wider transition-colors duration-200 min-h-[32px] px-1 -mx-1 rounded border border-transparent ${
+                      isActive
+                        ? "text-[#e8e6e3]"
+                        : "text-[#9f9f9f] hover:text-[#e8e6e3] hover:border-[#e8e6e3]/30"
+                    } ${!onFormulationChange ? "cursor-default" : "cursor-pointer"}`}
+                  >
+                    {f.label}
+                    {isActive ? " (active)" : ""}
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              key={graphKey}
+              className="w-full rounded overflow-hidden border border-[#e8e6e3]/10 analysis-graph-enter"
+            >
+              <canvas
+                ref={canvasRef}
+                className="w-full h-[260px] sm:h-[320px] block"
+                style={{ width: "100%", height: 320 }}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

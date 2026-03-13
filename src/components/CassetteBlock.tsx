@@ -31,10 +31,10 @@ export function CassetteBlock({
     <section
       id={id}
       data-section={id}
-      className="section flex items-center xl:items-start justify-center min-h-screen px-4 sm:px-8 pt-20 sm:pt-24 md:pt-24 lg:pt-24 xl:pt-36 pb-12 sm:pb-16 md:pb-20 lg:pb-24 lg:px-16 xl:px-24"
+      className="section flex items-center justify-center min-h-screen px-4 sm:px-8 py-16 sm:py-20 lg:px-16 xl:px-24"
     >
-      <div className="w-full max-w-[1100px] mx-auto min-w-0 flex justify-center items-center xl:items-start">
-        <div className="grid grid-cols-1 xl:grid-cols-[240px_360px_240px] gap-5 sm:gap-8 xl:gap-12 items-center xl:items-start w-full xl:w-[936px] xl:max-w-none xl:shrink-0 xl:mx-auto">
+      <div className="w-full max-w-[1100px] mx-auto min-w-0 flex justify-center items-center">
+        <div className="grid grid-cols-1 xl:grid-cols-[240px_360px_240px] gap-5 sm:gap-8 xl:gap-12 items-center w-full xl:w-[936px] xl:max-w-none xl:shrink-0 xl:mx-auto">
           <div className="order-1 text-center xl:text-left min-w-0 xl:max-w-[280px] xl:justify-self-end">
             <h2 className="text-lg sm:text-2xl md:text-2xl lg:text-3xl font-heading text-[#f2f2f2] uppercase tracking-[0.2em] mb-3 sm:mb-6 max-w-[20ch] leading-tight mx-auto xl:mx-0">
               {titleParts ? (

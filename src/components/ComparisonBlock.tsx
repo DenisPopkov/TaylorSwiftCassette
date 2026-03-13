@@ -8,7 +8,6 @@ import {
   getComparisonSrc,
   type FormulationId,
 } from "@/lib/comparisonSources";
-import { CASSETTE_IMAGES } from "@/lib/cassetteImages";
 import { AudioAnalysisPanel } from "@/components/AudioAnalysisPanel";
 
 function formatTime(seconds: number): string {
@@ -18,8 +17,14 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function withPlaybackKey(src: string, key: string): string {
+  const separator = src.includes("?") ? "&" : "?";
+  return `${src}${separator}playbackKey=${encodeURIComponent(key)}`;
+}
+
 export function ComparisonBlock() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const loadedSourceKeyRef = useRef<string | null>(null);
   const [formulation, setFormulation] = useState<FormulationId>("type-i");
   const [trackIndex, setTrackIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -32,30 +37,34 @@ export function ComparisonBlock() {
   const setGlobalPlaying = useSetAudioPlaying();
 
   const track = TTPD_TRACKS[trackIndex];
+  const hasPrev = trackIndex > 0;
+  const hasNext = trackIndex < TTPD_TRACKS.length - 1;
 
   useEffect(() => {
     setGlobalPlaying(playing);
     return () => setGlobalPlaying(false);
   }, [playing, setGlobalPlaying]);
 
-  // Клик по «Show audio analysis» может прийти через document (capture) — подписываемся на кастомное событие
   useEffect(() => {
     const onToggle = () => setShowAnalysis((v) => !v);
     window.addEventListener("toggle-audio-analysis", onToggle);
     return () => window.removeEventListener("toggle-audio-analysis", onToggle);
   }, []);
-  const hasPrev = trackIndex > 0;
-  const hasNext = trackIndex < TTPD_TRACKS.length - 1;
 
   const loadSource = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     const src = getComparisonSrc(trackIndex, formulation);
-    if (audio.src?.endsWith(src)) return;
+    const sourceKey = `${trackIndex}:${formulation}:${src}`;
+    const playbackSrc = withPlaybackKey(src, sourceKey);
+    if (loadedSourceKeyRef.current === sourceKey) return;
     wasPlayingRef.current = playing;
-    seekTimeRef.current = audio.currentTime;
-    audio.src = src;
+    seekTimeRef.current = seekTimeRef.current ?? audio.currentTime;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = playbackSrc;
     audio.load();
+    loadedSourceKeyRef.current = sourceKey;
   }, [trackIndex, formulation, playing]);
 
   useEffect(() => {
@@ -102,15 +111,20 @@ export function ComparisonBlock() {
     }
   }, [trackIndex]);
 
-  const switchFormulation = useCallback((next: FormulationId) => {
-    if (next === formulation) return;
-    const audio = audioRef.current;
-    if (audio) {
-      wasPlayingRef.current = playing;
-      seekTimeRef.current = audio.currentTime;
-    }
-    setFormulation(next);
-  }, [formulation, playing]);
+  const switchFormulation = useCallback(
+    (next: FormulationId) => {
+      if (next === formulation) return;
+      const audio = audioRef.current;
+      if (audio) {
+        wasPlayingRef.current = playing;
+        seekTimeRef.current = 0;
+        setCurrentTime(0);
+        setProgress(0);
+      }
+      setFormulation(next);
+    },
+    [formulation, playing]
+  );
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -125,6 +139,7 @@ export function ComparisonBlock() {
 
   const togglePlayRef = useRef(togglePlay);
   togglePlayRef.current = togglePlay;
+
   useEffect(() => {
     const onPlayPause = () => togglePlayRef.current?.();
     window.addEventListener("play-pause-compare", onPlayPause);
@@ -185,12 +200,11 @@ export function ComparisonBlock() {
           Switch between tape types to hear the difference instantly.
         </p>
 
-        {/* Source: блок с фоном для ясности */}
         <div className="rounded-md border border-[#e8e6e3]/15 bg-[#0b0b0b]/60 px-3 py-4 sm:px-4 sm:py-5 mb-6 sm:mb-8">
           <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2 sm:mb-3">
             Source
           </p>
-          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-3 mb-4 sm:mb-6">
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-3">
             {COMPARISON_FORMULATIONS.map(({ id, label }) => (
               <button
                 key={id}
@@ -206,47 +220,8 @@ export function ComparisonBlock() {
               </button>
             ))}
           </div>
-
-          {/* 5 кассет — на мобилке горизонтальный скролл; pl/pr чтобы первый и последний не обрезались */}
-          <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide pl-3 pr-3 sm:pl-0 sm:pr-0 sm:overflow-visible -mx-1 sm:mx-0">
-            {COMPARISON_FORMULATIONS.map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => switchFormulation(id)}
-                className={`flex flex-col items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8e6e3] rounded p-1.5 sm:p-2 transition-opacity shrink-0 ${
-                  formulation === id
-                    ? "opacity-100 bg-[#e8e6e3]/5"
-                    : "opacity-80 hover:opacity-100 bg-[#e8e6e3]/[0.03]"
-                }`}
-                aria-label={`Source ${label}`}
-              >
-                <span
-                  className="w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center overflow-hidden shrink-0 rounded border border-[#e8e6e3]/10 bg-[#0b0b0b]/80"
-                >
-                  <img
-                    src={CASSETTE_IMAGES[id] ?? CASSETTE_IMAGES["type-i"]}
-                    alt=""
-                    className="pointer-events-none object-contain w-full h-full"
-                    style={{
-                      objectFit: "contain",
-                      ...(id === "original"
-                        ? { maxWidth: "75%", maxHeight: "75%" }
-                        : id === "type-i"
-                          ? { maxWidth: "92%", maxHeight: "92%" }
-                          : {}),
-                    }}
-                  />
-                </span>
-                <span className="text-[9px] sm:text-xs font-heading uppercase tracking-wider text-[#9f9f9f]">
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Track: на мобилке — вертикальный список (все треки влазят), на sm+ — ряд с переносом */}
         <p className="text-[#9f9f9f] font-heading text-xs uppercase tracking-widest mb-2">
           Track
         </p>
@@ -290,13 +265,12 @@ export function ComparisonBlock() {
           onKeyDown={(e) => {
             const audio = audioRef.current;
             if (!audio) return;
-            if (e.key === "ArrowLeft")
+            if (e.key === "ArrowLeft") {
               audio.currentTime = Math.max(0, audio.currentTime - 5);
-            if (e.key === "ArrowRight")
-              audio.currentTime = Math.min(
-                audio.duration || 0,
-                audio.currentTime + 5
-              );
+            }
+            if (e.key === "ArrowRight") {
+              audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
+            }
           }}
         >
           <div
@@ -363,15 +337,14 @@ export function ComparisonBlock() {
           </button>
         </div>
 
-        {showAnalysis && (
-          <AudioAnalysisPanel
-            trackIndex={trackIndex}
-            formulation={formulation}
-            trackTitle={track?.title ?? ""}
-            isOpen={showAnalysis}
-            onFormulationChange={setFormulation}
-          />
-        )}
+        <AudioAnalysisPanel
+          trackIndex={trackIndex}
+          formulation={formulation}
+          trackTitle={track?.title ?? ""}
+          isOpen={showAnalysis}
+          onClose={() => setShowAnalysis(false)}
+          onFormulationChange={setFormulation}
+        />
       </div>
     </section>
   );

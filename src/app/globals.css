@@ -16,6 +16,14 @@ html.lock-scroll {
   overflow: hidden;
 }
 
+html.lock-scroll body {
+  overflow: hidden;
+}
+
+html.lock-scroll #scroll-container {
+  overflow: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--text);
@@ -131,4 +139,3 @@ body::before {
 .analysis-graph-enter {
   animation: fadeIn 0.35s ease-out;
 }
-

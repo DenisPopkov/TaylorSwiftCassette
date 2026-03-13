@@ -6,6 +6,11 @@ import { TTPD_TRACKS } from "@/lib/ttpdTracks";
 
 type Props = { onClose: () => void; cassetteLabel?: string };
 
+function withPlaybackKey(src: string, key: string): string {
+  const separator = src.includes("?") ? "&" : "?";
+  return `${src}${separator}playbackKey=${encodeURIComponent(key)}`;
+}
+
 export function AudioPlayer({ onClose, cassetteLabel }: Props) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const setGlobalPlaying = useSetAudioPlaying();
@@ -22,12 +27,19 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
     return () => setGlobalPlaying(false);
   }, [playing, setGlobalPlaying]);
 
+  useEffect(() => {
+    document.documentElement.classList.add("lock-scroll");
+    return () => document.documentElement.classList.remove("lock-scroll");
+  }, []);
+
   const loadTrack = useCallback((index: number) => {
     const audio = audioRef.current;
     if (!audio) return;
     const t = TTPD_TRACKS[index];
     if (!t) return;
-    audio.src = t.src;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = withPlaybackKey(t.src, `player-${t.id}`);
     setCurrentIndex(index);
     setProgress(0);
     setPlaying(false);
@@ -96,11 +108,11 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[10010] flex items-center justify-center bg-black/35 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-[#0b0b0b] border border-[#e8e6e3]/20 p-6 md:p-8 max-w-lg w-full max-h-[85vh] flex flex-col"
+        className="w-full max-w-lg max-h-[85vh] flex flex-col overflow-y-auto border border-[#e8e6e3]/20 bg-[#0b0b0b] p-6 md:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-end items-center mb-6">
@@ -124,10 +136,7 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
           Select track
         </p>
         <ul className="space-y-1 mb-6 max-h-48 overflow-y-auto pr-1">
-          <li className="text-[#9f9f9f] font-heading text-[10px] uppercase tracking-widest pt-0 pb-0.5">
-            SIDE A
-          </li>
-          {TTPD_TRACKS.slice(0, 3).map((t, i) => (
+          {TTPD_TRACKS.map((t, i) => (
             <li key={t.id}>
               <button
                 type="button"
@@ -155,40 +164,6 @@ export function AudioPlayer({ onClose, cassetteLabel }: Props) {
               </button>
             </li>
           ))}
-          <li className="text-[#9f9f9f] font-heading text-[10px] uppercase tracking-widest pt-3 pb-0.5">
-            SIDE B
-          </li>
-          {TTPD_TRACKS.slice(3, 5).map((t, i) => {
-            const idx = i + 3;
-            return (
-              <li key={t.id}>
-                <button
-                  type="button"
-                  onClick={() => loadTrack(idx)}
-                  className={`w-full text-left py-2 px-3 text-sm font-heading transition-colors flex items-center gap-2 ${
-                    currentIndex === idx
-                      ? "bg-[#e8e6e3]/15 text-[#e8e6e3] border-l-2 border-[#e8e6e3]"
-                      : "text-[#9f9f9f] hover:text-[#e8e6e3] hover:bg-[#e8e6e3]/5"
-                  }`}
-                >
-                  {currentIndex === idx && (
-                    <span className="text-[#e8e6e3] shrink-0 w-4 h-4 flex items-center justify-center" aria-hidden>
-                      {playing ? (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                        </svg>
-                      ) : (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M8 5v14l11-7L8 5z" />
-                        </svg>
-                      )}
-                    </span>
-                  )}
-                  {t.title}
-                </button>
-              </li>
-            );
-          })}
         </ul>
 
         <p className="text-[#e8e6e3] font-heading text-sm mb-4 truncate flex items-center gap-2" title={track?.title}>
